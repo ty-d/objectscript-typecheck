@@ -1,0 +1,3198 @@
+method,DateTimeToISO8601
+Command,Quit
+Delimiter,:
+Delimiter,(
+Local variable,pDateTime
+Operator,=
+String,""
+Delimiter,)
+String,""
+Command,Set
+Local variable,ret
+Operator,=
+Function,$CASE
+Delimiter,(
+Local variable,pDateTime
+Delimiter,,
+String,""
+Delimiter,:
+String,""
+Delimiter,,
+Delimiter,:
+Function,$REPLACE
+Delimiter,(
+Local variable,pDateTime
+Delimiter,,
+String," "
+Delimiter,,
+String,"T"
+Delimiter,)
+Operator,_
+String,"Z"
+Delimiter,)
+Command,Quit
+Local variable,ret
+method,OnPage
+Pre-Processor Command,#
+Pre-Processor Command,dim
+Local variable,%request
+Command,As
+Object name,%CSP
+Object name,.
+Object name,Request
+Pre-Processor Command,#
+Pre-Processor Command,dim
+Local variable,%response
+Command,As
+Object name,%CSP
+Object name,.
+Object name,Response
+Command,Set
+Local variable,Method
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"method"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,Xecute
+String,"do .."
+Operator,_
+Local variable,Method
+Operator,_
+String,"()"
+Command,Quit
+Macro,$$$
+Macro,OK
+method,getCSPDailyDataGrid
+Command,Kill
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"DailyDataGrid"
+Delimiter,)
+Command,Set
+Delimiter,(
+Local variable,dtFrom
+Delimiter,,
+Local variable,dtTo
+Delimiter,)
+Operator,=
+String,""
+Command,Set
+Local variable,dtFrom
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"dayFrom"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,Set
+Local variable,dtTo
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"dayTo"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,dtTo
+Operator,=
+String,""
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,dtTo
+Operator,=
+Operator,+
+System variable,$HOROLOG
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Local variable,dtTo
+Operator,=
+Function,$ZDATEH
+Delimiter,(
+Local variable,dtTo
+Delimiter,,
+Number,4
+Delimiter,)
+Brace,}
+Command,If
+Delimiter,(
+Local variable,dtFrom
+Operator,=
+String,""
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,dtFrom
+Operator,=
+Local variable,dtTo
+Operator,-
+Number,6
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Local variable,dtFrom
+Operator,=
+Function,$ZDATEH
+Delimiter,(
+Local variable,dtFrom
+Delimiter,,
+Number,4
+Delimiter,)
+Brace,}
+Command,New
+System variable,$NAMESPACE
+Command,Set
+System variable,$NAMESPACE
+Operator,=
+String,"%SYS"
+Command,Set
+Local variable,tSC
+Operator,=
+System variable,$SYSTEM
+Object name,.
+Object name,Status
+Object dot operator,.
+Object method,OK
+Delimiter,(
+Delimiter,)
+Command,Try
+Brace,{
+Command,Set
+Local variable,oRS
+Operator,=
+Object (Class),##class
+Delimiter,(
+Object name,%SQL
+Object name,.
+Object name,Statement
+Delimiter,)
+Object dot operator,.
+Object method,%New
+Delimiter,(
+Delimiter,)
+Command,Set
+Local variable,sql
+Operator,=
+String,"SELECT Daily, element_key as Metrica, NVL(Sys_CSPSession,0) as CSPSession FROM SYS_History.Daily_Sys WHERE Daily->ZDATE BETWEEN "
+Operator,_
+Local variable,dtFrom
+Operator,_
+String," AND "
+Operator,_
+Local variable,dtTo
+Command,Set
+Local variable,tSC
+Operator,=
+Local variable,oRS
+Object dot operator,.
+Object member,%Prepare
+Delimiter,(
+Local variable,sql
+Delimiter,)
+Command,Quit
+Delimiter,:
+System variable,$SYSTEM
+Object name,.
+Object name,Status
+Object dot operator,.
+Object member,IsError
+Delimiter,(
+Local variable,tSC
+Delimiter,)
+Command,Set
+Local variable,result
+Operator,=
+Local variable,oRS
+Object dot operator,.
+Object method,%Execute
+Delimiter,(
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,%SQLCODE
+Operator,'<
+Number,0
+Delimiter,)
+Brace,{
+Command,While
+Local variable,result
+Object dot operator,.
+Object method,%Next
+Delimiter,(
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,data
+Operator,=
+Function,$PIECE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,Daily
+Delimiter,,
+String,"||"
+Delimiter,,
+Number,1
+Delimiter,)
+Command,Set
+Local variable,hora
+Operator,=
+Function,$PIECE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,Daily
+Delimiter,,
+String,"||"
+Delimiter,,
+Number,2
+Delimiter,)
+Command,Set
+Local variable,metrica
+Operator,=
+Local variable,result
+Object dot operator,.
+Object attribute,Metrica
+Command,Set
+Local variable,sessions
+Operator,=
+Local variable,result
+Object dot operator,.
+Object attribute,CSPSession
+Command,Continue
+Delimiter,:
+Delimiter,(
+Local variable,metrica
+Operator,=
+String,"StDev"
+Delimiter,)
+Command,Set
+Local variable,obj
+Operator,=
+Function,$GET
+Delimiter,(
+Delimiter,^[
+String,"IRISMONITOR"
+Delimiter,]
+Global variable,IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"DailyDataGrid"
+Delimiter,,
+Local variable,data
+Delimiter,,
+Local variable,hora
+Delimiter,)
+Delimiter,)
+Command,Set
+Function,$PIECE
+Delimiter,(
+Local variable,obj
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,1
+Delimiter,)
+Operator,=
+Function,$ZDATE
+Delimiter,(
+Local variable,data
+Delimiter,,
+Number,4
+Delimiter,)
+Command,Set
+Function,$PIECE
+Delimiter,(
+Local variable,obj
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,2
+Delimiter,)
+Operator,=
+Function,$ZTIME
+Delimiter,(
+Local variable,hora
+Delimiter,,
+Number,2
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,metrica
+Operator,=
+String,"Avg"
+Delimiter,)
+Brace,{
+Command,Set
+Function,$PIECE
+Delimiter,(
+Local variable,obj
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,3
+Delimiter,)
+Operator,=
+Local variable,sessions
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Function,$PIECE
+Delimiter,(
+Local variable,obj
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,4
+Delimiter,)
+Operator,=
+Local variable,sessions
+Brace,}
+Command,Set
+Delimiter,^[
+String,"IRISMONITOR"
+Delimiter,]
+Global variable,IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"DailyDataGrid"
+Delimiter,,
+Local variable,data
+Delimiter,,
+Local variable,hora
+Delimiter,)
+Operator,=
+Local variable,obj
+Brace,}
+Brace,}
+Command,Else
+Brace,{
+Command,Throw
+Object (Class),##class
+Delimiter,(
+Object name,%Exception
+Object name,.
+Object name,SQL
+Delimiter,)
+Object dot operator,.
+Object method,CreateFromSQLCODE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,%SQLCODE
+Delimiter,,
+Local variable,result
+Object dot operator,.
+Object attribute,%Message
+Delimiter,)
+Brace,}
+Command,Set
+System variable,$NAMESPACE
+Operator,=
+String,"IRISMONITOR"
+Command,Set
+Local variable,arrDailyDataGrid
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Command,Set
+Local variable,dia
+Operator,=
+String,""
+Command,For
+Brace,{
+Command,Set
+Local variable,dia
+Operator,=
+Function,$ORDER
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"DailyDataGrid"
+Delimiter,,
+Local variable,dia
+Delimiter,)
+Delimiter,)
+Command,Quit
+Delimiter,:
+Local variable,dia
+Operator,=
+String,""
+Command,Set
+Local variable,horario
+Operator,=
+String,""
+Command,For
+Brace,{
+Command,Set
+Local variable,horario
+Operator,=
+Function,$ORDER
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"DailyDataGrid"
+Delimiter,,
+Local variable,dia
+Delimiter,,
+Local variable,horario
+Delimiter,)
+Delimiter,)
+Command,Quit
+Delimiter,:
+Local variable,horario
+Operator,=
+String,""
+Command,Set
+Local variable,oDaily
+Operator,=
+Function,$GET
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"DailyDataGrid"
+Delimiter,,
+Local variable,dia
+Delimiter,,
+Local variable,horario
+Delimiter,)
+Delimiter,)
+Command,Set
+Local variable,json
+Operator,=
+JSON bracket,{
+JSON bracket,}
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"date"
+Delimiter,,
+Function,$PIECE
+Delimiter,(
+Local variable,oDaily
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"time"
+Delimiter,,
+Function,$PIECE
+Delimiter,(
+Local variable,oDaily
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,2
+Delimiter,)
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"avg"
+Delimiter,,
+Function,$NORMALIZE
+Delimiter,(
+Function,$PIECE
+Delimiter,(
+Local variable,oDaily
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,3
+Delimiter,)
+Delimiter,,
+Number,2
+Delimiter,)
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"max"
+Delimiter,,
+Function,$NORMALIZE
+Delimiter,(
+Function,$PIECE
+Delimiter,(
+Local variable,oDaily
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,4
+Delimiter,)
+Delimiter,,
+Number,2
+Delimiter,)
+Delimiter,)
+Command,Do
+Local variable,arrDailyDataGrid
+Object dot operator,.
+Object method,%Push
+Delimiter,(
+Local variable,json
+Delimiter,)
+Brace,}
+Brace,}
+Brace,}
+Command,Catch
+Delimiter,(
+Local variable,oException
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,tSC
+Operator,=
+Local variable,oException
+Object dot operator,.
+Object method,AsStatus
+Delimiter,(
+Delimiter,)
+Brace,}
+Command,Write
+Local variable,arrDailyDataGrid
+Object dot operator,.
+Object method,%ToJSON
+Delimiter,(
+Delimiter,)
+Command,Quit
+Local variable,tSC
+method,getCSPDailyHistory
+Command,Kill
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"Daily"
+Delimiter,)
+Command,Set
+Delimiter,(
+Local variable,dtFrom
+Delimiter,,
+Local variable,dtTo
+Delimiter,)
+Operator,=
+String,""
+Command,Set
+Local variable,dtFrom
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"dayFrom"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,Set
+Local variable,dtTo
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"dayTo"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,dtTo
+Operator,=
+String,""
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,dtTo
+Operator,=
+Operator,+
+System variable,$HOROLOG
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Local variable,dtTo
+Operator,=
+Function,$ZDATEH
+Delimiter,(
+Local variable,dtTo
+Delimiter,,
+Number,4
+Delimiter,)
+Brace,}
+Command,If
+Delimiter,(
+Local variable,dtFrom
+Operator,=
+String,""
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,dtFrom
+Operator,=
+Local variable,dtTo
+Operator,-
+Number,6
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Local variable,dtFrom
+Operator,=
+Function,$ZDATEH
+Delimiter,(
+Local variable,dtFrom
+Delimiter,,
+Number,4
+Delimiter,)
+Brace,}
+Command,New
+System variable,$NAMESPACE
+Command,Set
+System variable,$NAMESPACE
+Operator,=
+String,"%SYS"
+Command,Set
+Local variable,tSC
+Operator,=
+System variable,$SYSTEM
+Object name,.
+Object name,Status
+Object dot operator,.
+Object method,OK
+Delimiter,(
+Delimiter,)
+Command,Try
+Brace,{
+Command,Set
+Local variable,oRS
+Operator,=
+Object (Class),##class
+Delimiter,(
+Object name,%SQL
+Object name,.
+Object name,Statement
+Delimiter,)
+Object dot operator,.
+Object method,%New
+Delimiter,(
+Delimiter,)
+Command,Set
+Local variable,sql
+Operator,=
+String,"SELECT Daily, element_key as Metrica, NVL(Sys_CSPSession,0) as CSPSession FROM SYS_History.Daily_Sys WHERE Daily->ZDATE BETWEEN "
+Operator,_
+Local variable,dtFrom
+Operator,_
+String," AND "
+Operator,_
+Local variable,dtTo
+Command,Set
+Local variable,tSC
+Operator,=
+Local variable,oRS
+Object dot operator,.
+Object member,%Prepare
+Delimiter,(
+Local variable,sql
+Delimiter,)
+Command,Quit
+Delimiter,:
+System variable,$SYSTEM
+Object name,.
+Object name,Status
+Object dot operator,.
+Object member,IsError
+Delimiter,(
+Local variable,tSC
+Delimiter,)
+Command,Set
+Local variable,result
+Operator,=
+Local variable,oRS
+Object dot operator,.
+Object method,%Execute
+Delimiter,(
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,%SQLCODE
+Operator,'<
+Number,0
+Delimiter,)
+Brace,{
+Command,While
+Local variable,result
+Object dot operator,.
+Object method,%Next
+Delimiter,(
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,data
+Operator,=
+Function,$PIECE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,Daily
+Delimiter,,
+String,"||"
+Delimiter,,
+Number,1
+Delimiter,)
+Command,Set
+Local variable,hora
+Operator,=
+Function,$PIECE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,Daily
+Delimiter,,
+String,"||"
+Delimiter,,
+Number,2
+Delimiter,)
+Command,Set
+Local variable,metrica
+Operator,=
+Local variable,result
+Object dot operator,.
+Object attribute,Metrica
+Command,Set
+Local variable,sessions
+Operator,=
+Local variable,result
+Object dot operator,.
+Object attribute,CSPSession
+Command,Continue
+Delimiter,:
+Delimiter,(
+Local variable,metrica
+Operator,=
+String,"StDev"
+Delimiter,)
+Command,Set
+Local variable,datetimeUTC
+Operator,=
+System variable,$SYSTEM
+Object name,.
+Object name,SQL
+Object dot operator,.
+Object member,DATEDIFF
+Delimiter,(
+String,"s"
+Delimiter,,
+String,"1970-01-01 00:00:00"
+Delimiter,,
+Function,$ZDATETIME
+Delimiter,(
+Local variable,data
+Operator,_
+String,","
+Operator,_
+Local variable,hora
+Delimiter,,
+Number,3
+Delimiter,)
+Delimiter,)
+Operator,*
+Number,1000
+Command,Set
+Delimiter,^[
+String,"IRISMONITOR"
+Delimiter,]
+Global variable,IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"Daily"
+Delimiter,,
+Local variable,metrica
+Delimiter,,
+Local variable,data
+Delimiter,,
+Local variable,hora
+Delimiter,)
+Operator,=
+Local variable,datetimeUTC
+Operator,_
+String,"^"
+Operator,_
+Local variable,sessions
+Brace,}
+Brace,}
+Command,Else
+Brace,{
+Command,Throw
+Object (Class),##class
+Delimiter,(
+Object name,%Exception
+Object name,.
+Object name,SQL
+Delimiter,)
+Object dot operator,.
+Object method,CreateFromSQLCODE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,%SQLCODE
+Delimiter,,
+Local variable,result
+Object dot operator,.
+Object attribute,%Message
+Delimiter,)
+Brace,}
+Command,Set
+System variable,$NAMESPACE
+Operator,=
+String,"IRISMONITOR"
+Command,Set
+Local variable,arrDaily
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Comment,// M�trica (Max, Avg, StDev)
+Command,Set
+Local variable,idMetrica
+Operator,=
+String,""
+Command,For
+Brace,{
+Command,Set
+Local variable,idMetrica
+Operator,=
+Function,$ORDER
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"Daily"
+Delimiter,,
+Local variable,idMetrica
+Delimiter,)
+Delimiter,)
+Command,Quit
+Delimiter,:
+Local variable,idMetrica
+Operator,=
+String,""
+Command,Set
+Local variable,arrMetrica
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Comment,// Data
+Command,Set
+Local variable,dtData
+Operator,=
+String,""
+Command,For
+Brace,{
+Command,Set
+Local variable,dtData
+Operator,=
+Function,$ORDER
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"Daily"
+Delimiter,,
+Local variable,idMetrica
+Delimiter,,
+Local variable,dtData
+Delimiter,)
+Delimiter,)
+Command,Quit
+Delimiter,:
+Local variable,dtData
+Operator,=
+String,""
+Comment,// Horario
+Command,Set
+Local variable,inthora
+Operator,=
+String,""
+Command,For
+Brace,{
+Command,Set
+Local variable,inthora
+Operator,=
+Function,$ORDER
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"Daily"
+Delimiter,,
+Local variable,idMetrica
+Delimiter,,
+Local variable,dtData
+Delimiter,,
+Local variable,inthora
+Delimiter,)
+Delimiter,)
+Command,Quit
+Delimiter,:
+Local variable,inthora
+Operator,=
+String,""
+Command,Set
+Local variable,arrDados
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Command,Set
+Local variable,obj
+Operator,=
+Function,$GET
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"Daily"
+Delimiter,,
+Local variable,idMetrica
+Delimiter,,
+Local variable,dtData
+Delimiter,,
+Local variable,inthora
+Delimiter,)
+Delimiter,)
+Command,Set
+Local variable,arrDados
+Object dot operator,.
+Object attribute,"0"
+Operator,=
+Function,$NUMBER
+Delimiter,(
+Function,$PIECE
+Delimiter,(
+Local variable,obj
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Comment,;DateTime UTC Format
+Command,Set
+Local variable,arrDados
+Object dot operator,.
+Object attribute,"1"
+Operator,=
+Function,$NORMALIZE
+Delimiter,(
+Function,$PIECE
+Delimiter,(
+Local variable,obj
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,2
+Delimiter,)
+Delimiter,,
+Number,2
+Delimiter,)
+Comment,;CSP Sessions
+Command,Do
+Local variable,arrMetrica
+Object dot operator,.
+Object method,%Push
+Delimiter,(
+Local variable,arrDados
+Delimiter,)
+Brace,}
+Brace,}
+Command,Set
+Local variable,json
+Operator,=
+JSON bracket,{
+JSON bracket,}
+Delimiter,,
+Local variable,jsonMarker
+Operator,=
+JSON bracket,{
+JSON bracket,}
+Delimiter,,
+Local variable,jsonfillColor
+Operator,=
+JSON bracket,{
+JSON bracket,}
+Delimiter,,
+Local variable,jsonlinearGradient
+Operator,=
+JSON bracket,{
+JSON bracket,}
+Delimiter,,
+Local variable,arrStops
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Delimiter,,
+Local variable,arrAllStops
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Command,Set
+Local variable,colorCode
+Operator,=
+Function,$SELECT
+Delimiter,(
+Local variable,idMetrica
+Operator,=
+String,"Max"
+Delimiter,:
+String,"#005542"
+Delimiter,,
+Local variable,idMetrica
+Operator,=
+String,"Avg"
+Delimiter,:
+String,"#cdeeaa"
+Delimiter,,
+Number,1
+Delimiter,:
+String,"#dfdfdf"
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"name"
+Delimiter,,
+Local variable,idMetrica
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"data"
+Delimiter,,
+Local variable,arrMetrica
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"color"
+Delimiter,,
+Local variable,colorCode
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"lineColor"
+Delimiter,,
+Local variable,colorCode
+Delimiter,)
+Command,Do
+Local variable,jsonMarker
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"enabled"
+Delimiter,,
+Number,0
+Delimiter,)
+Command,Do
+Local variable,jsonMarker
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"symbol"
+Delimiter,,
+String,"circle"
+Delimiter,)
+Command,Do
+Local variable,jsonMarker
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"radius"
+Delimiter,,
+Number,2
+Delimiter,)
+Command,Do
+Local variable,jsonMarker
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"lineWidth"
+Delimiter,,
+Number,1
+Delimiter,)
+Command,Do
+Local variable,jsonMarker
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"lineColor"
+Delimiter,,
+Local variable,colorCode
+Delimiter,)
+Command,Do
+Local variable,jsonMarker
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"fillColor"
+Delimiter,,
+String,"#ffffff"
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"marker"
+Delimiter,,
+Local variable,jsonMarker
+Delimiter,)
+Command,Do
+Local variable,jsonlinearGradient
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"x1"
+Delimiter,,
+Number,0
+Delimiter,)
+Command,Do
+Local variable,jsonlinearGradient
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"x2"
+Delimiter,,
+Number,0
+Delimiter,)
+Command,Do
+Local variable,jsonlinearGradient
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"y1"
+Delimiter,,
+Number,0
+Delimiter,)
+Command,Do
+Local variable,jsonlinearGradient
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"y2"
+Delimiter,,
+Number,1
+Delimiter,)
+Command,Set
+Local variable,arrStops
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Object dot operator,.
+Object member,%Push
+Delimiter,(
+Number,0
+Delimiter,)
+Object dot operator,.
+Object member,%Push
+Delimiter,(
+Local variable,colorCode
+Delimiter,)
+Command,Do
+Local variable,arrAllStops
+Object dot operator,.
+Object method,%Push
+Delimiter,(
+Local variable,arrStops
+Delimiter,)
+Command,Set
+Local variable,arrStops
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Object dot operator,.
+Object member,%Push
+Delimiter,(
+Number,1
+Delimiter,)
+Object dot operator,.
+Object member,%Push
+Delimiter,(
+String,"#ffffff"
+Delimiter,)
+Command,Do
+Local variable,arrAllStops
+Object dot operator,.
+Object method,%Push
+Delimiter,(
+Local variable,arrStops
+Delimiter,)
+Command,Do
+Local variable,jsonfillColor
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"linearGradient"
+Delimiter,,
+Local variable,jsonlinearGradient
+Delimiter,)
+Command,Do
+Local variable,jsonfillColor
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"stops"
+Delimiter,,
+Local variable,arrAllStops
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"fillColor"
+Delimiter,,
+Local variable,jsonfillColor
+Delimiter,)
+Command,Do
+Local variable,arrDaily
+Object dot operator,.
+Object method,%Push
+Delimiter,(
+Local variable,json
+Delimiter,)
+Brace,}
+Brace,}
+Command,Catch
+Delimiter,(
+Local variable,oException
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,tSC
+Operator,=
+Local variable,oException
+Object dot operator,.
+Object method,AsStatus
+Delimiter,(
+Delimiter,)
+Brace,}
+Command,Write
+Local variable,arrDaily
+Object dot operator,.
+Object method,%ToJSON
+Delimiter,(
+Delimiter,)
+Command,Quit
+Local variable,tSC
+method,getCSPHourlyDataGrid
+Command,Kill
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"HourlyDataGrid"
+Delimiter,)
+Command,Set
+Delimiter,(
+Local variable,dtFrom
+Delimiter,,
+Local variable,dtTo
+Delimiter,)
+Operator,=
+String,""
+Command,Set
+Local variable,dtFrom
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"hourFrom"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,Set
+Local variable,dtTo
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"hourTo"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,dtTo
+Operator,=
+String,""
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,dtTo
+Operator,=
+Operator,+
+System variable,$HOROLOG
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Local variable,dtTo
+Operator,=
+Function,$ZDATEH
+Delimiter,(
+Local variable,dtTo
+Delimiter,,
+Number,4
+Delimiter,)
+Brace,}
+Command,If
+Delimiter,(
+Local variable,dtFrom
+Operator,=
+String,""
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,dtFrom
+Operator,=
+Local variable,dtTo
+Operator,-
+Number,6
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Local variable,dtFrom
+Operator,=
+Function,$ZDATEH
+Delimiter,(
+Local variable,dtFrom
+Delimiter,,
+Number,4
+Delimiter,)
+Brace,}
+Command,New
+System variable,$NAMESPACE
+Command,Set
+System variable,$NAMESPACE
+Operator,=
+String,"%SYS"
+Command,Set
+Local variable,tSC
+Operator,=
+System variable,$SYSTEM
+Object name,.
+Object name,Status
+Object dot operator,.
+Object method,OK
+Delimiter,(
+Delimiter,)
+Command,Try
+Brace,{
+Command,Set
+Local variable,oRS
+Operator,=
+Object (Class),##class
+Delimiter,(
+Object name,%SQL
+Object name,.
+Object name,Statement
+Delimiter,)
+Object dot operator,.
+Object method,%New
+Delimiter,(
+Delimiter,)
+Command,Set
+Local variable,sql
+Operator,=
+String,"SELECT Hourly, element_key as Metrica, NVL(Sys_CSPSession,0) as CSPSession FROM SYS_History.Hourly_Sys WHERE Hourly->ZDATE BETWEEN "
+Operator,_
+Local variable,dtFrom
+Operator,_
+String," AND "
+Operator,_
+Local variable,dtTo
+Command,Set
+Local variable,tSC
+Operator,=
+Local variable,oRS
+Object dot operator,.
+Object member,%Prepare
+Delimiter,(
+Local variable,sql
+Delimiter,)
+Command,Quit
+Delimiter,:
+System variable,$SYSTEM
+Object name,.
+Object name,Status
+Object dot operator,.
+Object member,IsError
+Delimiter,(
+Local variable,tSC
+Delimiter,)
+Command,Set
+Local variable,result
+Operator,=
+Local variable,oRS
+Object dot operator,.
+Object method,%Execute
+Delimiter,(
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,%SQLCODE
+Operator,'<
+Number,0
+Delimiter,)
+Brace,{
+Command,While
+Local variable,result
+Object dot operator,.
+Object method,%Next
+Delimiter,(
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,data
+Operator,=
+Function,$PIECE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,Hourly
+Delimiter,,
+String,"||"
+Delimiter,,
+Number,1
+Delimiter,)
+Command,Set
+Local variable,hora
+Operator,=
+Function,$PIECE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,Hourly
+Delimiter,,
+String,"||"
+Delimiter,,
+Number,2
+Delimiter,)
+Command,Set
+Local variable,metrica
+Operator,=
+Local variable,result
+Object dot operator,.
+Object attribute,Metrica
+Command,Set
+Local variable,sessions
+Operator,=
+Local variable,result
+Object dot operator,.
+Object attribute,CSPSession
+Command,Continue
+Delimiter,:
+Delimiter,(
+Local variable,metrica
+Operator,=
+String,"StDev"
+Delimiter,)
+Command,Set
+Local variable,obj
+Operator,=
+Function,$GET
+Delimiter,(
+Delimiter,^[
+String,"IRISMONITOR"
+Delimiter,]
+Global variable,IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"HourlyDataGrid"
+Delimiter,,
+Local variable,data
+Delimiter,,
+Local variable,hora
+Delimiter,)
+Delimiter,)
+Command,Set
+Function,$PIECE
+Delimiter,(
+Local variable,obj
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,1
+Delimiter,)
+Operator,=
+Function,$ZDATE
+Delimiter,(
+Local variable,data
+Delimiter,,
+Number,4
+Delimiter,)
+Command,Set
+Function,$PIECE
+Delimiter,(
+Local variable,obj
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,2
+Delimiter,)
+Operator,=
+Function,$ZTIME
+Delimiter,(
+Local variable,hora
+Delimiter,,
+Number,2
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,metrica
+Operator,=
+String,"Avg"
+Delimiter,)
+Brace,{
+Command,Set
+Function,$PIECE
+Delimiter,(
+Local variable,obj
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,3
+Delimiter,)
+Operator,=
+Local variable,sessions
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Function,$PIECE
+Delimiter,(
+Local variable,obj
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,4
+Delimiter,)
+Operator,=
+Local variable,sessions
+Brace,}
+Command,Set
+Delimiter,^[
+String,"IRISMONITOR"
+Delimiter,]
+Global variable,IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"HourlyDataGrid"
+Delimiter,,
+Local variable,data
+Delimiter,,
+Local variable,hora
+Delimiter,)
+Operator,=
+Local variable,obj
+Brace,}
+Brace,}
+Command,Else
+Brace,{
+Command,Throw
+Object (Class),##class
+Delimiter,(
+Object name,%Exception
+Object name,.
+Object name,SQL
+Delimiter,)
+Object dot operator,.
+Object method,CreateFromSQLCODE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,%SQLCODE
+Delimiter,,
+Local variable,result
+Object dot operator,.
+Object attribute,%Message
+Delimiter,)
+Brace,}
+Command,Set
+System variable,$NAMESPACE
+Operator,=
+String,"IRISMONITOR"
+Command,Set
+Local variable,arrHourlyDataGrid
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Command,Set
+Local variable,dia
+Operator,=
+String,""
+Command,For
+Brace,{
+Command,Set
+Local variable,dia
+Operator,=
+Function,$ORDER
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"HourlyDataGrid"
+Delimiter,,
+Local variable,dia
+Delimiter,)
+Delimiter,)
+Command,Quit
+Delimiter,:
+Local variable,dia
+Operator,=
+String,""
+Command,Set
+Local variable,horario
+Operator,=
+String,""
+Command,For
+Brace,{
+Command,Set
+Local variable,horario
+Operator,=
+Function,$ORDER
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"HourlyDataGrid"
+Delimiter,,
+Local variable,dia
+Delimiter,,
+Local variable,horario
+Delimiter,)
+Delimiter,)
+Command,Quit
+Delimiter,:
+Local variable,horario
+Operator,=
+String,""
+Command,Set
+Local variable,oHourly
+Operator,=
+Function,$GET
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"HourlyDataGrid"
+Delimiter,,
+Local variable,dia
+Delimiter,,
+Local variable,horario
+Delimiter,)
+Delimiter,)
+Command,Set
+Local variable,json
+Operator,=
+JSON bracket,{
+JSON bracket,}
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"date"
+Delimiter,,
+Function,$PIECE
+Delimiter,(
+Local variable,oHourly
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"time"
+Delimiter,,
+Function,$PIECE
+Delimiter,(
+Local variable,oHourly
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,2
+Delimiter,)
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"avg"
+Delimiter,,
+Function,$NORMALIZE
+Delimiter,(
+Function,$PIECE
+Delimiter,(
+Local variable,oHourly
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,3
+Delimiter,)
+Delimiter,,
+Number,2
+Delimiter,)
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"max"
+Delimiter,,
+Function,$NORMALIZE
+Delimiter,(
+Function,$PIECE
+Delimiter,(
+Local variable,oHourly
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,4
+Delimiter,)
+Delimiter,,
+Number,2
+Delimiter,)
+Delimiter,)
+Command,Do
+Local variable,arrHourlyDataGrid
+Object dot operator,.
+Object method,%Push
+Delimiter,(
+Local variable,json
+Delimiter,)
+Brace,}
+Brace,}
+Brace,}
+Command,Catch
+Delimiter,(
+Local variable,oException
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,tSC
+Operator,=
+Local variable,oException
+Object dot operator,.
+Object method,AsStatus
+Delimiter,(
+Delimiter,)
+Brace,}
+Command,Write
+Local variable,arrHourlyDataGrid
+Object dot operator,.
+Object method,%ToJSON
+Delimiter,(
+Delimiter,)
+Command,Quit
+Local variable,tSC
+method,getCSPHourlyHistory
+Command,Kill
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"Hourly"
+Delimiter,)
+Command,Set
+Delimiter,(
+Local variable,dtFrom
+Delimiter,,
+Local variable,dtTo
+Delimiter,)
+Operator,=
+String,""
+Command,Set
+Local variable,dtFrom
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"hourFrom"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,Set
+Local variable,dtTo
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"hourTo"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,dtTo
+Operator,=
+String,""
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,dtTo
+Operator,=
+Operator,+
+System variable,$HOROLOG
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Local variable,dtTo
+Operator,=
+Function,$ZDATEH
+Delimiter,(
+Local variable,dtTo
+Delimiter,,
+Number,4
+Delimiter,)
+Brace,}
+Command,If
+Delimiter,(
+Local variable,dtFrom
+Operator,=
+String,""
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,dtFrom
+Operator,=
+Local variable,dtTo
+Operator,-
+Number,6
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Local variable,dtFrom
+Operator,=
+Function,$ZDATEH
+Delimiter,(
+Local variable,dtFrom
+Delimiter,,
+Number,4
+Delimiter,)
+Brace,}
+Command,New
+System variable,$NAMESPACE
+Command,Set
+System variable,$NAMESPACE
+Operator,=
+String,"%SYS"
+Command,Set
+Local variable,tSC
+Operator,=
+System variable,$SYSTEM
+Object name,.
+Object name,Status
+Object dot operator,.
+Object method,OK
+Delimiter,(
+Delimiter,)
+Command,Try
+Brace,{
+Command,Set
+Local variable,oRS
+Operator,=
+Object (Class),##class
+Delimiter,(
+Object name,%SQL
+Object name,.
+Object name,Statement
+Delimiter,)
+Object dot operator,.
+Object method,%New
+Delimiter,(
+Delimiter,)
+Command,Set
+Local variable,sql
+Operator,=
+String,"SELECT Hourly, element_key as Metrica, NVL(Sys_CSPSession,0) as CSPSession FROM SYS_History.Hourly_Sys WHERE Hourly->ZDATE BETWEEN "
+Operator,_
+Local variable,dtFrom
+Operator,_
+String," AND "
+Operator,_
+Local variable,dtTo
+Command,Set
+Local variable,tSC
+Operator,=
+Local variable,oRS
+Object dot operator,.
+Object member,%Prepare
+Delimiter,(
+Local variable,sql
+Delimiter,)
+Command,Quit
+Delimiter,:
+System variable,$SYSTEM
+Object name,.
+Object name,Status
+Object dot operator,.
+Object member,IsError
+Delimiter,(
+Local variable,tSC
+Delimiter,)
+Command,Set
+Local variable,result
+Operator,=
+Local variable,oRS
+Object dot operator,.
+Object method,%Execute
+Delimiter,(
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,%SQLCODE
+Operator,'<
+Number,0
+Delimiter,)
+Brace,{
+Command,While
+Local variable,result
+Object dot operator,.
+Object method,%Next
+Delimiter,(
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,data
+Operator,=
+Function,$PIECE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,Hourly
+Delimiter,,
+String,"||"
+Delimiter,,
+Number,1
+Delimiter,)
+Command,Set
+Local variable,hora
+Operator,=
+Function,$PIECE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,Hourly
+Delimiter,,
+String,"||"
+Delimiter,,
+Number,2
+Delimiter,)
+Command,Set
+Local variable,metrica
+Operator,=
+Local variable,result
+Object dot operator,.
+Object attribute,Metrica
+Command,Set
+Local variable,sessions
+Operator,=
+Local variable,result
+Object dot operator,.
+Object attribute,CSPSession
+Command,Continue
+Delimiter,:
+Delimiter,(
+Local variable,metrica
+Operator,=
+String,"StDev"
+Delimiter,)
+Command,Set
+Local variable,datetimeUTC
+Operator,=
+System variable,$SYSTEM
+Object name,.
+Object name,SQL
+Object dot operator,.
+Object member,DATEDIFF
+Delimiter,(
+String,"s"
+Delimiter,,
+String,"1970-01-01 00:00:00"
+Delimiter,,
+Function,$ZDATETIME
+Delimiter,(
+Local variable,data
+Operator,_
+String,","
+Operator,_
+Local variable,hora
+Delimiter,,
+Number,3
+Delimiter,)
+Delimiter,)
+Operator,*
+Number,1000
+Command,Set
+Delimiter,^[
+String,"IRISMONITOR"
+Delimiter,]
+Global variable,IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"Hourly"
+Delimiter,,
+Local variable,metrica
+Delimiter,,
+Local variable,data
+Delimiter,,
+Local variable,hora
+Delimiter,)
+Operator,=
+Local variable,datetimeUTC
+Operator,_
+String,"^"
+Operator,_
+Local variable,sessions
+Brace,}
+Brace,}
+Command,Else
+Brace,{
+Command,Throw
+Object (Class),##class
+Delimiter,(
+Object name,%Exception
+Object name,.
+Object name,SQL
+Delimiter,)
+Object dot operator,.
+Object method,CreateFromSQLCODE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,%SQLCODE
+Delimiter,,
+Local variable,result
+Object dot operator,.
+Object attribute,%Message
+Delimiter,)
+Brace,}
+Command,Set
+System variable,$NAMESPACE
+Operator,=
+String,"IRISMONITOR"
+Command,Set
+Local variable,arrHourly
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Comment,// M�trica (Max, Avg, StDev)
+Command,Set
+Local variable,idMetrica
+Operator,=
+String,""
+Command,For
+Brace,{
+Command,Set
+Local variable,idMetrica
+Operator,=
+Function,$ORDER
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"Hourly"
+Delimiter,,
+Local variable,idMetrica
+Delimiter,)
+Delimiter,)
+Command,Quit
+Delimiter,:
+Local variable,idMetrica
+Operator,=
+String,""
+Command,Set
+Local variable,arrMetrica
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Comment,// Data
+Command,Set
+Local variable,dtData
+Operator,=
+String,""
+Command,For
+Brace,{
+Command,Set
+Local variable,dtData
+Operator,=
+Function,$ORDER
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"Hourly"
+Delimiter,,
+Local variable,idMetrica
+Delimiter,,
+Local variable,dtData
+Delimiter,)
+Delimiter,)
+Command,Quit
+Delimiter,:
+Local variable,dtData
+Operator,=
+String,""
+Comment,// Horario
+Command,Set
+Local variable,inthora
+Operator,=
+String,""
+Command,For
+Brace,{
+Command,Set
+Local variable,inthora
+Operator,=
+Function,$ORDER
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"Hourly"
+Delimiter,,
+Local variable,idMetrica
+Delimiter,,
+Local variable,dtData
+Delimiter,,
+Local variable,inthora
+Delimiter,)
+Delimiter,)
+Command,Quit
+Delimiter,:
+Local variable,inthora
+Operator,=
+String,""
+Command,Set
+Local variable,arrDados
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Command,Set
+Local variable,obj
+Operator,=
+Function,$GET
+Delimiter,(
+Global variable,^IRISMonitor
+Delimiter,(
+String,"CSP"
+Delimiter,,
+String,"Hourly"
+Delimiter,,
+Local variable,idMetrica
+Delimiter,,
+Local variable,dtData
+Delimiter,,
+Local variable,inthora
+Delimiter,)
+Delimiter,)
+Command,Set
+Local variable,arrDados
+Object dot operator,.
+Object attribute,"0"
+Operator,=
+Function,$NUMBER
+Delimiter,(
+Function,$PIECE
+Delimiter,(
+Local variable,obj
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Comment,;DateTime UTC Format
+Command,Set
+Local variable,arrDados
+Object dot operator,.
+Object attribute,"1"
+Operator,=
+Function,$NORMALIZE
+Delimiter,(
+Function,$PIECE
+Delimiter,(
+Local variable,obj
+Delimiter,,
+String,"^"
+Delimiter,,
+Number,2
+Delimiter,)
+Delimiter,,
+Number,2
+Delimiter,)
+Comment,;CSP Sessions
+Command,Do
+Local variable,arrMetrica
+Object dot operator,.
+Object method,%Push
+Delimiter,(
+Local variable,arrDados
+Delimiter,)
+Brace,}
+Brace,}
+Command,Set
+Local variable,json
+Operator,=
+JSON bracket,{
+JSON bracket,}
+Delimiter,,
+Local variable,jsonMarker
+Operator,=
+JSON bracket,{
+JSON bracket,}
+Delimiter,,
+Local variable,jsonfillColor
+Operator,=
+JSON bracket,{
+JSON bracket,}
+Delimiter,,
+Local variable,jsonlinearGradient
+Operator,=
+JSON bracket,{
+JSON bracket,}
+Delimiter,,
+Local variable,arrStops
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Delimiter,,
+Local variable,arrAllStops
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Command,Set
+Local variable,colorCode
+Operator,=
+Function,$SELECT
+Delimiter,(
+Local variable,idMetrica
+Operator,=
+String,"Max"
+Delimiter,:
+String,"#00bd56"
+Delimiter,,
+Local variable,idMetrica
+Operator,=
+String,"Avg"
+Delimiter,:
+String,"#85ef47"
+Delimiter,,
+Number,1
+Delimiter,:
+String,"#f9fd50"
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"name"
+Delimiter,,
+Local variable,idMetrica
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"data"
+Delimiter,,
+Local variable,arrMetrica
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"color"
+Delimiter,,
+Local variable,colorCode
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"lineColor"
+Delimiter,,
+Local variable,colorCode
+Delimiter,)
+Command,Do
+Local variable,jsonMarker
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"enabled"
+Delimiter,,
+Number,0
+Delimiter,)
+Command,Do
+Local variable,jsonMarker
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"symbol"
+Delimiter,,
+String,"circle"
+Delimiter,)
+Command,Do
+Local variable,jsonMarker
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"radius"
+Delimiter,,
+Number,2
+Delimiter,)
+Command,Do
+Local variable,jsonMarker
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"lineWidth"
+Delimiter,,
+Number,1
+Delimiter,)
+Command,Do
+Local variable,jsonMarker
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"lineColor"
+Delimiter,,
+Local variable,colorCode
+Delimiter,)
+Command,Do
+Local variable,jsonMarker
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"fillColor"
+Delimiter,,
+String,"#ffffff"
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"marker"
+Delimiter,,
+Local variable,jsonMarker
+Delimiter,)
+Command,Do
+Local variable,jsonlinearGradient
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"x1"
+Delimiter,,
+Number,0
+Delimiter,)
+Command,Do
+Local variable,jsonlinearGradient
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"x2"
+Delimiter,,
+Number,0
+Delimiter,)
+Command,Do
+Local variable,jsonlinearGradient
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"y1"
+Delimiter,,
+Number,0
+Delimiter,)
+Command,Do
+Local variable,jsonlinearGradient
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"y2"
+Delimiter,,
+Number,1
+Delimiter,)
+Command,Set
+Local variable,arrStops
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Object dot operator,.
+Object member,%Push
+Delimiter,(
+Number,0
+Delimiter,)
+Object dot operator,.
+Object member,%Push
+Delimiter,(
+Local variable,colorCode
+Delimiter,)
+Command,Do
+Local variable,arrAllStops
+Object dot operator,.
+Object method,%Push
+Delimiter,(
+Local variable,arrStops
+Delimiter,)
+Command,Set
+Local variable,arrStops
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Object dot operator,.
+Object member,%Push
+Delimiter,(
+Number,1
+Delimiter,)
+Object dot operator,.
+Object member,%Push
+Delimiter,(
+String,"#ffffff"
+Delimiter,)
+Command,Do
+Local variable,arrAllStops
+Object dot operator,.
+Object method,%Push
+Delimiter,(
+Local variable,arrStops
+Delimiter,)
+Command,Do
+Local variable,jsonfillColor
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"linearGradient"
+Delimiter,,
+Local variable,jsonlinearGradient
+Delimiter,)
+Command,Do
+Local variable,jsonfillColor
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"stops"
+Delimiter,,
+Local variable,arrAllStops
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"fillColor"
+Delimiter,,
+Local variable,jsonfillColor
+Delimiter,)
+Command,Do
+Local variable,arrHourly
+Object dot operator,.
+Object method,%Push
+Delimiter,(
+Local variable,json
+Delimiter,)
+Brace,}
+Brace,}
+Command,Catch
+Delimiter,(
+Local variable,oException
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,tSC
+Operator,=
+Local variable,oException
+Object dot operator,.
+Object method,AsStatus
+Delimiter,(
+Delimiter,)
+Brace,}
+Command,Write
+Local variable,arrHourly
+Object dot operator,.
+Object method,%ToJSON
+Delimiter,(
+Delimiter,)
+Command,Quit
+Local variable,tSC
+method,getCSPLiveHistory
+Command,Set
+Delimiter,(
+Local variable,dtFrom
+Delimiter,,
+Local variable,dtTo
+Delimiter,)
+Operator,=
+String,""
+Command,Set
+Local variable,dtFrom
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"fiveMinFrom"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,Set
+Local variable,dtTo
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"fiveMinTo"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,dtTo
+Operator,=
+String,""
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,dtTo
+Operator,=
+Operator,+
+System variable,$HOROLOG
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Local variable,dtTo
+Operator,=
+Function,$ZDATEH
+Delimiter,(
+Local variable,dtTo
+Delimiter,,
+Number,4
+Delimiter,)
+Brace,}
+Command,If
+Delimiter,(
+Local variable,dtFrom
+Operator,=
+String,""
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,dtFrom
+Operator,=
+Local variable,dtTo
+Operator,-
+Number,6
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Local variable,dtFrom
+Operator,=
+Function,$ZDATEH
+Delimiter,(
+Local variable,dtFrom
+Delimiter,,
+Number,4
+Delimiter,)
+Brace,}
+Command,New
+System variable,$NAMESPACE
+Command,Set
+System variable,$NAMESPACE
+Operator,=
+String,"%SYS"
+Command,Set
+Local variable,tSC
+Operator,=
+System variable,$SYSTEM
+Object name,.
+Object name,Status
+Object dot operator,.
+Object method,OK
+Delimiter,(
+Delimiter,)
+Command,Set
+Local variable,arrayLicenseLive
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Command,Try
+Brace,{
+Command,Set
+Local variable,oRS
+Operator,=
+Object (Class),##class
+Delimiter,(
+Object name,%SQL
+Object name,.
+Object name,Statement
+Delimiter,)
+Object dot operator,.
+Object method,%New
+Delimiter,(
+Delimiter,)
+Command,Set
+Local variable,sql
+Operator,=
+String,"SELECT top 1000 DateTime, NVL(Sys_CSPSession,0) as CSPSession FROM SYS_History.SysData WHERE ZDATE BETWEEN "
+Operator,_
+Local variable,dtFrom
+Operator,_
+String," AND "
+Operator,_
+Local variable,dtTo
+Command,Set
+Local variable,tSC
+Operator,=
+Local variable,oRS
+Object dot operator,.
+Object member,%Prepare
+Delimiter,(
+Local variable,sql
+Delimiter,)
+Command,Quit
+Delimiter,:
+System variable,$SYSTEM
+Object name,.
+Object name,Status
+Object dot operator,.
+Object member,IsError
+Delimiter,(
+Local variable,tSC
+Delimiter,)
+Command,Set
+Local variable,result
+Operator,=
+Local variable,oRS
+Object dot operator,.
+Object method,%Execute
+Delimiter,(
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,%SQLCODE
+Operator,'<
+Number,0
+Delimiter,)
+Brace,{
+Command,While
+Local variable,result
+Object dot operator,.
+Object method,%Next
+Delimiter,(
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,arrayDados
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Command,Set
+Local variable,arrayDados
+Object dot operator,.
+Object attribute,"0"
+Operator,=
+Object dot operator,..
+Object member,DateTimeToISO8601
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,DateTime
+Delimiter,)
+Command,Set
+Local variable,arrayDados
+Object dot operator,.
+Object attribute,"1"
+Operator,=
+Local variable,result
+Object dot operator,.
+Object attribute,CSPSession
+Command,Do
+Local variable,arrayLicenseLive
+Object dot operator,.
+Object method,%Push
+Delimiter,(
+Local variable,arrayDados
+Delimiter,)
+Brace,}
+Brace,}
+Command,Else
+Brace,{
+Command,Throw
+Object (Class),##class
+Delimiter,(
+Object name,%Exception
+Object name,.
+Object name,SQL
+Delimiter,)
+Object dot operator,.
+Object method,CreateFromSQLCODE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,%SQLCODE
+Delimiter,,
+Local variable,result
+Object dot operator,.
+Object attribute,%Message
+Delimiter,)
+Brace,}
+Brace,}
+Command,Catch
+Delimiter,(
+Local variable,oException
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,tSC
+Operator,=
+Local variable,oException
+Object dot operator,.
+Object method,AsStatus
+Delimiter,(
+Delimiter,)
+Brace,}
+Command,Write
+Local variable,arrayLicenseLive
+Object dot operator,.
+Object method,%ToJSON
+Delimiter,(
+Delimiter,)
+Command,Quit
+Local variable,tSC
+method,getCSPSessionEveryFiveMinDataGrid
+Command,Set
+Delimiter,(
+Local variable,dtFrom
+Delimiter,,
+Local variable,dtTo
+Delimiter,)
+Operator,=
+String,""
+Command,Set
+Local variable,dtFrom
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"fiveMinFrom"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,Set
+Local variable,dtTo
+Operator,=
+Function,$GET
+Delimiter,(
+Local variable,%request
+Object dot operator,.
+Object member,Data
+Delimiter,(
+String,"fiveMinTo"
+Delimiter,,
+Number,1
+Delimiter,)
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,dtTo
+Operator,=
+String,""
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,dtTo
+Operator,=
+Operator,+
+System variable,$HOROLOG
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Local variable,dtTo
+Operator,=
+Function,$ZDATEH
+Delimiter,(
+Local variable,dtTo
+Delimiter,,
+Number,4
+Delimiter,)
+Brace,}
+Command,If
+Delimiter,(
+Local variable,dtFrom
+Operator,=
+String,""
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,dtFrom
+Operator,=
+Local variable,dtTo
+Operator,-
+Number,6
+Brace,}
+Command,Else
+Brace,{
+Command,Set
+Local variable,dtFrom
+Operator,=
+Function,$ZDATEH
+Delimiter,(
+Local variable,dtFrom
+Delimiter,,
+Number,4
+Delimiter,)
+Brace,}
+Command,New
+System variable,$NAMESPACE
+Command,Set
+System variable,$NAMESPACE
+Operator,=
+String,"%SYS"
+Command,Set
+Local variable,tSC
+Operator,=
+System variable,$SYSTEM
+Object name,.
+Object name,Status
+Object dot operator,.
+Object method,OK
+Delimiter,(
+Delimiter,)
+Command,Set
+Local variable,arrayCSPFiveMin
+Operator,=
+JSON bracket,[
+JSON bracket,]
+Command,Try
+Brace,{
+Command,Set
+Local variable,oRS
+Operator,=
+Object (Class),##class
+Delimiter,(
+Object name,%SQL
+Object name,.
+Object name,Statement
+Delimiter,)
+Object dot operator,.
+Object method,%New
+Delimiter,(
+Delimiter,)
+Command,Set
+Local variable,sql
+Operator,=
+String,"SELECT top 1000 DateTime, NVL(Sys_CSPSession,0) as CSPSession FROM SYS_History.SysData WHERE ZDATE BETWEEN "
+Operator,_
+Local variable,dtFrom
+Operator,_
+String," AND "
+Operator,_
+Local variable,dtTo
+Command,Set
+Local variable,tSC
+Operator,=
+Local variable,oRS
+Object dot operator,.
+Object member,%Prepare
+Delimiter,(
+Local variable,sql
+Delimiter,)
+Command,Quit
+Delimiter,:
+System variable,$SYSTEM
+Object name,.
+Object name,Status
+Object dot operator,.
+Object member,IsError
+Delimiter,(
+Local variable,tSC
+Delimiter,)
+Command,Set
+Local variable,result
+Operator,=
+Local variable,oRS
+Object dot operator,.
+Object method,%Execute
+Delimiter,(
+Delimiter,)
+Command,If
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,%SQLCODE
+Operator,'<
+Number,0
+Delimiter,)
+Brace,{
+Command,While
+Local variable,result
+Object dot operator,.
+Object method,%Next
+Delimiter,(
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,json
+Operator,=
+JSON bracket,{
+JSON bracket,}
+Command,Set
+Local variable,dia
+Operator,=
+Function,$PIECE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,DateTime
+Delimiter,,
+String," "
+Delimiter,,
+Number,1
+Delimiter,)
+Command,Set
+Local variable,hora
+Operator,=
+Function,$PIECE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,DateTime
+Delimiter,,
+String," "
+Delimiter,,
+Number,2
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"date"
+Delimiter,,
+Function,$ZDATE
+Delimiter,(
+Function,$ZDATEH
+Delimiter,(
+Local variable,dia
+Delimiter,,
+Number,3
+Delimiter,)
+Delimiter,,
+Number,4
+Delimiter,)
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"time"
+Delimiter,,
+Local variable,hora
+Delimiter,)
+Command,Do
+Local variable,json
+Object dot operator,.
+Object method,%Set
+Delimiter,(
+String,"cspSessions"
+Delimiter,,
+Function,$NUMBER
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,CSPSession
+Delimiter,)
+Delimiter,)
+Command,Do
+Local variable,arrayCSPFiveMin
+Object dot operator,.
+Object method,%Push
+Delimiter,(
+Local variable,json
+Delimiter,)
+Brace,}
+Brace,}
+Command,Else
+Brace,{
+Command,Throw
+Object (Class),##class
+Delimiter,(
+Object name,%Exception
+Object name,.
+Object name,SQL
+Delimiter,)
+Object dot operator,.
+Object method,CreateFromSQLCODE
+Delimiter,(
+Local variable,result
+Object dot operator,.
+Object attribute,%SQLCODE
+Delimiter,,
+Local variable,result
+Object dot operator,.
+Object attribute,%Message
+Delimiter,)
+Brace,}
+Brace,}
+Command,Catch
+Delimiter,(
+Local variable,oException
+Delimiter,)
+Brace,{
+Command,Set
+Local variable,tSC
+Operator,=
+Local variable,oException
+Object dot operator,.
+Object method,AsStatus
+Delimiter,(
+Delimiter,)
+Brace,}
+Command,Write
+Local variable,arrayCSPFiveMin
+Object dot operator,.
+Object method,%ToJSON
+Delimiter,(
+Delimiter,)
+Command,Quit
+Local variable,tSC

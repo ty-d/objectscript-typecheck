@@ -1,1 +1,24 @@
-Command,if,Local variable,pInt,Operator,=,Number,10,Command,quit,Number,5,Command,elseif,Local variable,pBool,Command,quit,Local variable,pBool,
+method,Something
+Command,Set
+Local variable,ret
+Operator,=
+Function,$CASE
+Delimiter,(
+Local variable,pDateTime
+Delimiter,,
+String,""
+Delimiter,:
+String,""
+Delimiter,,
+Delimiter,:
+Function,$REPLACE
+Delimiter,(
+Local variable,pDateTime
+Delimiter,,
+String," "
+Delimiter,,
+String,"T"
+Delimiter,)
+Operator,_
+String,"Z"
+Delimiter,)

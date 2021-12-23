@@ -29,6 +29,8 @@ executable TypeCheck
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
-    build-depends:    base ^>=4.14.2.0, parsec, mtl, containers
+    build-depends:    base ^>=4.14.2.0, parsec, mtl, containers, array
+    build-tools:        happy
     hs-source-dirs:   app
     default-language: Haskell2010
+    other-modules: Parser, ParserTypes, Inferer
