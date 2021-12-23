@@ -1,0 +1,1 @@
+happy -o app/Parser.hs parser/Parser.y
